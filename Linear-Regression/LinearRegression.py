@@ -1,16 +1,15 @@
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
-
+import pandas as pd
 
 class GradientDescent(object):
-    def __init__(self, X, y, training_times=1000, LearningRate=0.0001):
+    def __init__(self, X, y, training_times = 10000, learningRate = 0.00001):
         '''
-        Initialize
+        初始化数据
         '''
-        self.y = y
         self.training_times = training_times
-        self.LearningRate = LearningRate
+        self.learningRate = learningRate
+        self.y = y
         self.shape = X.shape
         self.dimension = self.shape[1] + 1
         self.numberOfSamples = self.shape[0]
@@ -21,62 +20,66 @@ class GradientDescent(object):
 
     def calculatingGradient(self):
         '''
-        X^T * (X * theta - y)
+        计算梯度
         '''
-        X_theta_minus_y = np.matmul(self.X, self.theta) - self.y
-        return np.matmul((self.X).T, X_theta_minus_y)
+        a = np.matmul(self.X, self.theta) - self.y
+        gradient = np.matmul((self.X).T, a)
+        return gradient
 
     def descent(self):
         '''
-        update theta
+        梯度下降
+        更新theta
         '''
         for i in range(self.training_times):
-            a = self.calculatingGradient()
-            self.theta -= self.LearningRate * a
+            X_theta_minus_y = self.calculatingGradient()
+            self.theta -= X_theta_minus_y * self.learningRate
             if i % 50 == 0:
                 print(self.loss())
             else:
                 self.loss()
-            return self.theta
+        return self.theta
 
     def loss(self):
-        '''
-        a向量的平方可以等价于a的转置乘a
-        get loss between y and y_pred
-        Loss = (X*theta-Y)^T * (X*theta-Y)
-        '''
-        X_theta_minus_y = np.matmul(self.X, self.theta) - self.y
-        loss = np.matmul((X_theta_minus_y).T, X_theta_minus_y)
+        a = np.matmul(self.X, self.theta) - self.y
+        loss = np.matmul(a.T, a)
         self.lossList.append(int(loss))
         return loss
 
 
 def createData():
     '''
-    y=2x+1
+    y = 2x+1
     '''
-    X = 10 * np.random.randn(200, 1)
+    X = 10 * np.random.rand(200, 1)
     theta = np.array([[2]])
     y = np.matmul(X, theta) + 1
+    '''
+    增加扰动
+    '''
     salt = np.random.randn(200, 1)
-    y = y.reshape((-1, 1)) + 3 * salt
+    y = y.reshape((-1, 1)) + salt * 3
     return X, y
 
-
 def main():
-    X, y=createData()
-    print(X, y)
-    plt.scatter(X, y)
+    X, y = createData()
     gradientDescent = GradientDescent(X, y)
-    theta_ans = gradientDescent.descent()
-    y_pred = np.matmul(gradientDescent.X, theta_ans)
+    plt.scatter(X, y)
+    theta_min = gradientDescent.descent()
+    y_pred = np.matmul(gradientDescent.X, theta_min)
     plt.plot(X, y_pred, color='r')
     plt.show()
     plt.close()
     loss = gradientDescent.lossList
-    x = [i for i in range(1000)]
+    # for i in range(1000):
+    #     plt.plot(i, loss)
+    x = [i for i in range(10000)]
     plt.plot(x, loss)
     plt.show()
 
 if __name__ == '__main__':
     main()
+
+
+
+
