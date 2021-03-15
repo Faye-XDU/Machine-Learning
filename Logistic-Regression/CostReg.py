@@ -12,7 +12,6 @@ def costReg(X, y, theta, learningRate):
 
     first = np.multiply(-y, np.log(sigmoid(X*theta.T)))
     second = np.multiply(-(1 - y), np.log(1 - sigmoid(X*theta.T)))
-    reg = (learningRate / (2 * len(X))) *
-    np.sum(np.power(theta[:, 1, theta.shape[1]], 2))
+    reg = (learningRate / (2 * len(X))) * np.sum(np.power(theta[:, 1, theta.shape[1]], 2))
 
     return np.sum(first + second) / len(X) + reg
